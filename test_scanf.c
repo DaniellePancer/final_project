@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-/* Include the implementation directly */
+
 #include "my_scanf.c"
 
 void run_tests() {
