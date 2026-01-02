@@ -1,174 +1,168 @@
-#include <stdio.h>
-#include <string.h>
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
+#include <wchar.h>
 #include "my_scanf.c"
+
+void rand_string(char *s, size_t len) {
+    static const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    for (size_t i = 0; i < len; i++) {
+        s[i] = charset[rand() % (sizeof(charset) - 1)];
+    }
+    s[len] = '\0';
+}
 
 void run_tests() {
 
     {
-        int result = 0;
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "42\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
-        int assigned = my_scanf("%d", &result);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(result == 42);
-        fclose(input_stream);
+        int x = 0;
+        FILE *f = tmpfile();
+        fprintf(f, "42\n");
+        rewind(f);
+        input_file = f;
+        int assigned = my_scanf("%d", &x);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && x == 42);
     }
-
 
     {
-        int result = 0;
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "1a\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
-        int assigned = my_scanf("%x", &result);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(result == 26);
-        fclose(input_stream);
+        int x = 0;
+        FILE *f = tmpfile();
+        fprintf(f, "1a\n");
+        rewind(f);
+        input_file = f;
+        int assigned = my_scanf("%x", &x);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && x == 26);
     }
-
 
     {
-        int result = 0;
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "1010\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
-        int assigned = my_scanf("%b", &result);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(result == 10);
-        fclose(input_stream);
+        int x = 0;
+        FILE *f = tmpfile();
+        fprintf(f, "1010\n");
+        rewind(f);
+        input_file = f;
+        int assigned = my_scanf("%b", &x);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && x == 10);
     }
-
 
     {
         unsigned u = 0;
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "1234\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
+        FILE *f = tmpfile();
+        fprintf(f, "1234\n");
+        rewind(f);
+        input_file = f;
         int assigned = my_scanf("%u", &u);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(u == 1234);
-        fclose(input_stream);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && u == 1234);
     }
-
 
     {
-        float f = 0.0f;
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "-12.34\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
-        int assigned = my_scanf("%f", &f);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(f < -12.33f && f > -12.35f);
-        fclose(input_stream);
+        float fval = 0;
+        FILE *f = tmpfile();
+        fprintf(f, "-12.34\n");
+        rewind(f);
+        input_file = f;
+        int assigned = my_scanf("%f", &fval);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && fval < -12.33f && fval > -12.35f);
     }
-
 
     {
         char s[20];
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "hello\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
+        FILE *f = tmpfile();
+        fprintf(f, "hello\n");
+        rewind(f);
+        input_file = f;
         int assigned = my_scanf("%s", s);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(strcmp(s, "hello") == 0);
-        fclose(input_stream);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && strcmp(s, "hello") == 0);
     }
-
 
     {
         char c;
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "K\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
+        FILE *f = tmpfile();
+        fprintf(f, "K\n");
+        rewind(f);
+        input_file = f;
         int assigned = my_scanf("%c", &c);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(c == 'K');
-        fclose(input_stream);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && c == 'K');
     }
-
 
     {
         char q[50];
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "\"first quote\"\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
+        FILE *f = tmpfile();
+        fprintf(f, "\"first quote\"\n");
+        rewind(f);
+        input_file = f;
         int assigned = my_scanf("%q", q);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(strcmp(q, "first quote") == 0);
-        fclose(input_stream);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && strcmp(q, "first quote") == 0);
     }
-
 
     {
-        int result;
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "   -99  ");
-        rewind(input_stream);
-
-        input_file = input_stream;
-        int assigned = my_scanf("%d", &result);
-        input_file = NULL;
-
-        assert(assigned == 1);
-        assert(result == -99);
-        fclose(input_stream);
+        int x;
+        FILE *f = tmpfile();
+        fprintf(f, "   -99  ");
+        rewind(f);
+        input_file = f;
+        int assigned = my_scanf("%d", &x);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && x == -99);
     }
-
 
     {
         char s[5];
-        FILE *input_stream = tmpfile();
-        fprintf(input_stream, "HelloWorld\n");
-        rewind(input_stream);
-
-        input_file = input_stream;
+        FILE *f = tmpfile();
+        fprintf(f, "HelloWorld\n");
+        rewind(f);
+        input_file = f;
         int assigned = my_scanf("%4s", s);
-        input_file = NULL;
+        input_file = NULL; fclose(f);
+        assert(assigned == 1 && strcmp(s, "Hell") == 0);
+    }
 
+    {
+        char tmp[20];
+        rand_string(tmp, 10);
+        FILE *f = tmpfile();
+        fprintf(f, "%s\n", tmp);
+        rewind(f);
+        input_file = f;
+        wchar_t r[20] = {0};
+        int assigned = my_scanf("%ls", r);
+        input_file = NULL; fclose(f);
         assert(assigned == 1);
-        assert(strcmp(s, "Hell") == 0);
-        fclose(input_stream);
+        for (int i = 0; i < 10; i++) {
+            assert(r[i] == (wchar_t)tmp[i]);
+        }
+    }
+
+    {
+        char tmp[10];
+        rand_string(tmp, 5);
+        FILE *f = tmpfile();
+        fprintf(f, "%s\n", tmp);
+        rewind(f);
+        input_file = f;
+        int width = 3;
+        wchar_t r2[10] = {0};
+        char fmt[10];
+        sprintf(fmt, "%%%dls", width);
+        int assigned = my_scanf(fmt, r2);
+        input_file = NULL; fclose(f);
+        assert(assigned == 1);
+        for (int i = 0; i < width; i++) {
+            assert(r2[i] == (wchar_t)tmp[i]);
+        }
     }
 }
 
 int main() {
     run_tests();
-    printf("All tests passed!\n");
+    printf("all tests passed!\n");
     return 0;
 }
