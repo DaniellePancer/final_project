@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+int main() {
+    FILE *inputFile;
+    FILE *outputFile;
+    char ch;   
+    int count = 0; 
+
+    inputFile = fopen("source.c", "r");
+    if (inputFile == NULL) {
+        printf("Error: cannot open source file.\n");
+        return 1;
+    }
+
+    outputFile = fopen("new", "w");
+    if (outputFile == NULL) {
+        printf("Error: cannot create output file.\n");
+        fclose(inputFile);
+        return 1;
+    }
+
+    
+    while ((ch = fgetc(inputFile)) != EOF) {
+        if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r') {
+            fputc(ch, outputFile);
+            count++;
+        }
+    }
+
+    printf("Whitespace removed successfully. Total characters written: %d\n", count);
+
+    fclose(inputFile);
+    fclose(outputFile);
+
+    return 0;
+}
