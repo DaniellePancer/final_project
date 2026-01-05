@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <string.h>   
 
 static FILE *input_file = NULL;
 
@@ -24,9 +25,9 @@ static int read_numbers(long long *out, int base, int width, int signed_flag) {
     long long value = 0;
     skip_spaces();
     c = getchar();
-    if (signed_flag && (c == '-' || c == '+')) { 
+    if (signed_flag && (c == '-' || c == '+')) {
         if (c == '-') sign = -1;
-        c = getchar(); 
+        c = getchar();
     }
     while (c != EOF && (width != 0)) {
         int digit = -1;
@@ -118,6 +119,19 @@ static int read_quote_strings(char *out, int width) {
     return 1;
 }
 
+
+static int read_cat(int *out, int width) {
+    char buffer[16];
+    if (!read_strings(buffer, width)) return 0;
+
+    if (!strcmp(buffer, "cat") || !strcmp(buffer, "meow"))
+        *out = 1;   
+    else
+        *out = 0;   
+
+    return 1;
+}
+
 int my_scanf(const char *format, ...) {
     va_list parameters;
     va_start(parameters, format);
@@ -128,79 +142,81 @@ int my_scanf(const char *format, ...) {
             format++;
             int width = -1;
             int length = 0;
-            if (isdigit(*format)) { width = 0; while (isdigit(*format)) { width = width*10 + (*format-'0'); format++; } }
 
-            if (*format == 'h') { format++; if (*format == 'h') { length=2; format++; } else length=1; }
-            else if (*format == 'l') { format++; if (*format == 'l') { length=4; format++; } else length=3; }
-            else if (*format == 'L') { length=5; format++; }
+            if (isdigit(*format)) {
+                width = 0;
+                while (isdigit(*format)) {
+                    width = width * 10 + (*format - '0');
+                    format++;
+                }
+            }
+
+            if (*format == 'h') { format++; if (*format == 'h') { length = 2; format++; } else length = 1; }
+            else if (*format == 'l') { format++; if (*format == 'l') { length = 4; format++; } else length = 3; }
+            else if (*format == 'L') { length = 5; format++; }
 
             switch (*format) {
                 case 'd': case 'i': {
                     long long temp;
-                    if (!read_numbers(&temp,10,width,1)) goto done;
-                    if (length==0) { int *p=va_arg(parameters,int*); *p=(int)temp; }
-                    else if (length==1) { short *p=va_arg(parameters,short*); *p=(short)temp; }
-                    else if (length==2) { signed char *p=va_arg(parameters,signed char*); *p=(signed char)temp; }
-                    else if (length==3) { long *p=va_arg(parameters,long*); *p=(long)temp; }
-                    else if (length==4) { long long *p=va_arg(parameters,long long*); *p=temp; }
+                    if (!read_numbers(&temp, 10, width, 1)) goto done;
+                    if (length == 0) { int *p = va_arg(parameters, int*); *p = (int)temp; }
+                    else if (length == 1) { short *p = va_arg(parameters, short*); *p = (short)temp; }
+                    else if (length == 2) { signed char *p = va_arg(parameters, signed char*); *p = (signed char)temp; }
+                    else if (length == 3) { long *p = va_arg(parameters, long*); *p = (long)temp; }
+                    else if (length == 4) { long long *p = va_arg(parameters, long long*); *p = temp; }
                     assigned++; break;
                 }
                 case 'u': {
                     unsigned long long temp;
-                    if (!read_unsigned(&temp,width)) goto done;
-                    if (length==0) { unsigned *p=va_arg(parameters,unsigned*); *p=(unsigned)temp; }
-                    else if (length==1) { unsigned short *p=va_arg(parameters,unsigned short*); *p=(unsigned short)temp; }
-                    else if (length==2) { unsigned char *p=va_arg(parameters,unsigned char*); *p=(unsigned char)temp; }
-                    else if (length==3) { unsigned long *p=va_arg(parameters,unsigned long*); *p=(unsigned long)temp; }
-                    else if (length==4) { unsigned long long *p=va_arg(parameters,unsigned long long*); *p=temp; }
+                    if (!read_unsigned(&temp, width)) goto done;
+                    if (length == 0) { unsigned *p = va_arg(parameters, unsigned*); *p = (unsigned)temp; }
+                    else if (length == 1) { unsigned short *p = va_arg(parameters, unsigned short*); *p = (unsigned short)temp; }
+                    else if (length == 2) { unsigned char *p = va_arg(parameters, unsigned char*); *p = (unsigned char)temp; }
+                    else if (length == 3) { unsigned long *p = va_arg(parameters, unsigned long*); *p = (unsigned long)temp; }
+                    else if (length == 4) { unsigned long long *p = va_arg(parameters, unsigned long long*); *p = temp; }
                     assigned++; break;
                 }
                 case 'x': {
                     unsigned long long temp;
-                    if (!read_numbers((long long*)&temp,16,width,0)) goto done;
-                    if (length==0) { unsigned *p=va_arg(parameters,unsigned*); *p=(unsigned)temp; }
-                    else if (length==1) { unsigned short *p=va_arg(parameters,unsigned short*); *p=(unsigned short)temp; }
-                    else if (length==2) { unsigned char *p=va_arg(parameters,unsigned char*); *p=(unsigned char)temp; }
-                    else if (length==3) { unsigned long *p=va_arg(parameters,unsigned long*); *p=(unsigned long)temp; }
-                    else if (length==4) { unsigned long long *p=va_arg(parameters,unsigned long long*); *p=temp; }
+                    if (!read_numbers((long long*)&temp, 16, width, 0)) goto done;
+                    unsigned *p = va_arg(parameters, unsigned*);
+                    *p = (unsigned)temp;
                     assigned++; break;
                 }
                 case 'b': {
                     long long temp;
-                    if (!read_numbers(&temp,2,width,0)) goto done;
-                    int *p=va_arg(parameters,int*);
-		    *p=temp;
-                    assigned++;
-		    break;
+                    if (!read_numbers(&temp, 2, width, 0)) goto done;
+                    int *p = va_arg(parameters, int*);
+                    *p = (int)temp;
+                    assigned++; break;
                 }
                 case 'f': {
                     long double temp;
-                    if (!read_floats(&temp,width)) goto done;
-                    if (length==0) { float *p=va_arg(parameters,float*); *p=(float)temp; }
-                    else if (length==3) { double *p=va_arg(parameters,double*); *p=(double)temp; }
-                    else if (length==5) { long double *p=va_arg(parameters,long double*); *p=temp; }
+                    if (!read_floats(&temp, width)) goto done;
+                    if (length == 0) { float *p = va_arg(parameters, float*); *p = (float)temp; }
+                    else if (length == 3) { double *p = va_arg(parameters, double*); *p = (double)temp; }
+                    else if (length == 5) { long double *p = va_arg(parameters, long double*); *p = temp; }
                     assigned++; break;
                 }
                 case 's': {
-                    if (length==0) { char *p=va_arg(parameters,char*); if(!read_strings(p,width)) goto done; }
-                    else if (length==3) { wchar_t *p=va_arg(parameters,wchar_t*); int c,count=0;
-                        skip_spaces();
-                        while((c=getchar())!=EOF && !isspace(c) && (width!=0)) {
-                            p[count++]=(wchar_t)c;
-                            if(width>0) width--;
-                        }
-                        p[count]=L'\0';
-                        if(count==0) goto done;
-                    }
+                    char *p = va_arg(parameters, char*);
+                    if (!read_strings(p, width)) goto done;
                     assigned++; break;
                 }
                 case 'c': {
-                    if(length==0) { char *p=va_arg(parameters,char*); if(!read_characters(p)) goto done; }
-                    else if(length==3) { wchar_t *p=va_arg(parameters,wchar_t*); int c=getchar(); if(c==EOF) goto done; *p=(wchar_t)c; }
+                    char *p = va_arg(parameters, char*);
+                    if (!read_characters(p)) goto done;
                     assigned++; break;
                 }
                 case 'q': {
-                    char *p=va_arg(parameters,char*); if(!read_quote_strings(p,width)) goto done; assigned++; break;
+                    char *p = va_arg(parameters, char*);
+                    if (!read_quote_strings(p, width)) goto done;
+                    assigned++; break;
+                }
+                case 'C': {   
+                    int *p = va_arg(parameters, int*);
+                    if (!read_cat(p, width)) goto done;
+                    assigned++; break;
                 }
                 default: goto done;
             }
@@ -208,8 +224,8 @@ int my_scanf(const char *format, ...) {
         } else if (isspace(*format)) {
             skip_spaces();
         } else {
-            int c=getchar();
-            if(c!=*format) goto done;
+            int c = getchar();
+            if (c != *format) goto done;
         }
         format++;
     }
