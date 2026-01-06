@@ -63,7 +63,7 @@ int main(void) {
     fclose(temp_file);
     printf("value = %c\n\n", c);
 
-    printf("Testing %%4s\n");
+    printf("Testing \n");
     temp_file = tmpfile();
     fprintf(temp_file, "HelloWorld\n");
     rewind(temp_file);
