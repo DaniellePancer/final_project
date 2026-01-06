@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <wchar.h>
-#include <string.h>   
+#include <string.h>
 
 static FILE *input_file = NULL;
 
@@ -124,10 +124,10 @@ static int read_cat(int *out, int width) {
     char buffer[16];
     if (!read_strings(buffer, width)) return 0;
 
-    if (!strcmp(buffer, "cat") || !strcmp(buffer, "meow"))
-        *out = 1;   
+    if (!strcmp(buffer, "cat") || !strcmp(buffer, "meow") || !strcmp(buffer, "kitten"))
+        *out = 1;
     else
-        *out = 0;   
+        *out = 0;
 
     return 1;
 }
@@ -213,7 +213,7 @@ int my_scanf(const char *format, ...) {
                     if (!read_quote_strings(p, width)) goto done;
                     assigned++; break;
                 }
-                case 'C': {   
+                case 'C': {
                     int *p = va_arg(parameters, int*);
                     if (!read_cat(p, width)) goto done;
                     assigned++; break;
@@ -234,3 +234,12 @@ done:
     va_end(parameters);
     return assigned;
 }
+
+
+
+
+
+
+
+
+
