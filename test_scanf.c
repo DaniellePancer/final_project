@@ -4,13 +4,6 @@
 #include <string.h>
 #include "my_scanf.c"
 
-void rand_string(char *s, size_t len) {
-    static const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for (size_t i = 0; i < len; i++) {
-        s[i] = charset[rand() % (sizeof(charset) - 1)];
-    }
-    s[len] = '\0';
-}
 
 void run_tests() {
 
